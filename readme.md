@@ -13,7 +13,7 @@
   </a>
 </p>
 
-> 😋 A lightweight python CLI/WebGUI SSL-certificate expire checker with alert function
+> 😋 A GUI/CLI tool which can download files from a shared Plex Share
 
 ## Install
 ```sh
@@ -26,28 +26,20 @@ pip install -r requirements.txt
 ```sh
 Usage: python PlexGet.py [OPTION] ...
 
--d, --delete        Delete a domain from the db
-    --all           Clear the table or delete the db
--a, --add           Add a domain to the db
--l, --list          List domains in db
-    --all           To print more details
--u, --update        Update expiry date
--c, --create        Create file
-    --pdf
+-s, --server        Start Server Mode
+-c, --cli           Start tool as CLI Client
+
 
 Example:
-python PlexGet.py -c pdf
-python PlexGet.py --delete google.com 443
-python PlexGet.py --list
+python PlexGet.py server #start the server on 127.0.0.1:80
+
 ```
 
 
 ## 📃 ToDo
-- [x] full list and simple list
+- [x] start with project
 - [ ] Server mode
-- [ ] PDF generator
-- [ ] get data as json
-- [ ] get specific value
+- [ ] CLI mode
 
 
 ## Author
