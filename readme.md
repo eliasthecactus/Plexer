@@ -8,7 +8,7 @@
     <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
   </a>
   <img alt="Version: v1.0.0-alpha1" src="https://img.shields.io/badge/version-v1.0.0--alpha1-blue" />
-  <a href="https://github.com/eliasthecactus/PlexGet/blob/main/LICENSE" target="_blank">
+  <a href="https://github.com/eliasthecactus/PlexGet/blob/master/LICENSE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/github/license/eliasthecactus/PlexGet" />
   </a>
 </p>
@@ -26,13 +26,13 @@ pip install -r requirements.txt
 ```sh
 Usage: python PlexGet.py [OPTION] ...
 
--s, --server        Start Server Mode
--c, --cli           Start tool as CLI Client
+--server [port]         Start Server Mode on the defined port
+--cli                   Start tool as CLI Client
 
 
 Example:
-python PlexGet.py server #start the server on 127.0.0.1:80
-
+python PlexGet.py -s 80
+python PlexGet.py -c
 ```
 
 
