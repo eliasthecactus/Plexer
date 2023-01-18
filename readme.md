@@ -57,4 +57,4 @@ Give a ⭐️ if this project helped you!
 
 
 ## 📝 License
-[Copyright](https://github.com/eliasthecactus/PlexGet/blob/main/LICENSE) © 2022 [eliasthecactus](https://github.com/eliasthecactus)
+[Copyright](https://github.com/eliasthecactus/PlexGet/blob/master/LICENSE) © 2022 [eliasthecactus](https://github.com/eliasthecactus)
