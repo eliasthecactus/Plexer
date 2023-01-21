@@ -1,4 +1,9 @@
 example.xml
 output.xml
 readme.txt
-venv/*
+libraries.json
+servers.json
+PlexGet.log
+config
+venv
+__pycache__
