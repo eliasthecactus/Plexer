@@ -1,9 +1,7 @@
 example.xml
 output.xml
 readme.txt
-libraries.json
-servers.json
 PlexGet.log
-config
+data
 venv
 __pycache__
