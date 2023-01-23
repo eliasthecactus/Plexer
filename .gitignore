@@ -5,3 +5,4 @@ PlexGet.log
 data
 venv
 __pycache__
+.DS_Store

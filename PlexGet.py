@@ -100,6 +100,8 @@ def configure():
         except:
             printMenu("","")
             saveCred(str(input("Plex Username/Mail: ")),str(input("Plex Password: ")),args.config)
+    printMenu("Configuration finished","You can now use your saved configuration. Press ENTER to continue.")
+    input("")
     main()
 
 def printMenu(title, choices):
