@@ -20,6 +20,7 @@
 git clone https://github.com/eliasthecactus/PlexGet.git
 cd PlexGet/
 pip install -r requirements.txt
+python PlexGet.py --help
 ```
 
 ## Usage
@@ -31,15 +32,14 @@ Usage: python PlexGet.py [OPTION] ...
 
 
 Example:
-python PlexGet.py -s 80
-python PlexGet.py -c
+python PlexGet.py --mode cli
 ```
 
 
 ## 📃 ToDo
 - [x] start with project
+- [x] CLI mode
 - [ ] Server mode
-- [ ] CLI mode
 
 
 ## Author
