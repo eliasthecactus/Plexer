@@ -1,4 +1,4 @@
-
+i made [plexer.me](https://plexer.me) to download from shared drives...
 <h1 align="left">PlexGet</h1>
 <p>
   <a href="https://github.com/eliasthecactus/PlexGet#readme" target="_blank">
