@@ -1,4 +1,3 @@
-i made [plexer.me](https://plexer.me) to download from shared drives...
 <h1 align="left">Plexer</h1>
 <p>
   <a href="https://github.com/eliasthecactus/Plexer#readme" target="_blank">
@@ -18,9 +17,7 @@ i made [plexer.me](https://plexer.me) to download from shared drives...
 
 
 ## Usage
-```sh
 visit [plexer.me](https://plexer.me)
-```
 
 
 ## 📃 ToDo
