@@ -372,10 +372,6 @@ body {
     background: rgb(85, 85, 85);
 }
 
-::-webkit-scrollbar-corner {
-    background-color: rgba(red, green, blue, 0);
-}
-
 .div_mediaCard_lower_summary {
     height: calc(80px + 5vh);
     width: 100%;
