@@ -351,6 +351,10 @@ body {
     font-weight: 500;
 }
 
+::-webkit-scrollbar-corner {
+    background: rgba(0,0,0,0);
+}
+
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
