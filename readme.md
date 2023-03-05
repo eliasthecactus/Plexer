@@ -17,7 +17,7 @@
 
 
 ## Usage
-visit [plexer.me](https://plexer.me)
+visit [plexer.me](https://plexer.me) or the [repos page](https://eliasthecactus.github.io/Plexer/)
 
 
 ## 📃 ToDo
