@@ -1,0 +1,11 @@
+<div class="flex justify-between items-center p-4">
+    <div class="flex items-center">
+        <span class="text-3xl font-bold">plexer</span>
+    </div>
+    <nav class="space-x-4">
+        <p-button severity="secondary" (click)="changeServer()" *ngIf="showChangeServerButton" label="Change Server" size="small" />    
+        <p-button [loading]="isLoading" severity="warn" (click)="logout()" *ngIf="isLoggedIn" icon="pi pi-sign-out" size="small" />        
+    </nav>
+</div>
+
+<p-toast />

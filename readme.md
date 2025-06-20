@@ -1,4 +1,4 @@
-<h1 align="left">Plexer</h1>
+<h1>Plexer</h1>
 <p>
   <a href="https://github.com/eliasthecactus/Plexer#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
@@ -17,18 +17,18 @@
 
 
 ## Usage
-visit [plexer.me](https://plexer.me) or the [repos page](https://eliasthecactus.github.io/Plexer/)
+Visit for [HTTP Plexer](http://plexer.apps.elias.uno) HTTP/HTTPS or [Plexer](https://eliasthecactus.github.io/plexer/browse) for only HTTPS. To run locally (support HTTP and HTTPS), use ```docker run --name plexer -p 8080:80 ghcr.io/eliasthecactus/plexer:latest``` and open [https://localhost:8080](https://localhost:8080)
 
 
 ## 📃 ToDo
 - [x] start with project
 - [x] make it work
-- [ ] Add JDownloader suppot for mass download
+- [x] Add JDownloader suppot for mass download (added link list which can be copied to jdownloader)
+- [x] Rewrite in Angular
 
 
 ## Author
 👤 **elias**
-* Instagram: [@eliasthecactus](https://instagram.com/eliasthecactus)
 * Github: [@eliasthecactus](https://github.com/eliasthecactus)
 
 
@@ -41,4 +41,4 @@ Give a ⭐️ if this project helped you!
 
 
 ## 📝 License
-[Copyright](https://github.com/eliasthecactus/Plexer/blob/master/LICENSE) © 2022 [eliasthecactus](https://github.com/eliasthecactus)
+[Copyright](https://github.com/eliasthecactus/Plexer/blob/master/LICENSE) © 20225 [eliasthecactus](https://github.com/eliasthecactus)

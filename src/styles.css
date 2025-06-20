@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+@font-face {
+  font-family: 'Inter';
+  src: url(/fonts/Inter/Inter-VariableFont.ttf) format('truetype');
+}
+
+* {
+    font-family: 'Inter', sans-serif;
+}

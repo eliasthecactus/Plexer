@@ -1,0 +1,8 @@
+services:
+  plexer:
+    container_name: plexer
+    image: ghcr.io/eliasthecactus/plexer:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+

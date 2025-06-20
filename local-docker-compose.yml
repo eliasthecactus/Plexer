@@ -1,0 +1,13 @@
+services:
+  website:
+    # Build the image using the Dockerfile in the current directory
+    build: .
+    # Map port 8080 on your host machine to port 80 inside the container
+    # You can access your website locally at http://localhost:8080
+    ports:
+      - "8080:80"
+    # Optional: If you want to automatically restart the container if it stops
+    restart: unless-stopped
+    # Optional: Give your container a friendly name
+    container_name: plexer
+

@@ -1,0 +1,119 @@
+<div class="flex flex-col w-full h-full items-center">
+    <div *ngIf="isCheckingConnection" class="flex flex-col">
+        <div class="block text-center">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+        </div>
+        <div class="text-center py-10 text-gray-500">Checking server connection...</div>
+    </div>
+
+    <div *ngIf="!isCheckingConnection && isOnline" class="flex flex-col w-10/12 gap-4">
+
+        <div class="flex gap-2 w-full">
+            <form class="flex gap-2 w-full" (ngSubmit)="performSearch(searchString)">
+                <p-inputgroup>
+                    <p-inputgroup-addon>
+                        <p-button icon="pi pi-filter" label="Filter" severity="secondary" variant="text"
+                            (click)="showFilterModal = !showFilterModal"
+                            [disabled]="isCheckingConnection || !isOnline || true" />
+                    </p-inputgroup-addon>
+
+                    <input pInputText [(ngModel)]="searchString" name="searchString" placeholder="Search media" />
+
+                    <p-button label="Search" [loading]="isSearching" type="submit" />
+                </p-inputgroup>
+            </form>
+        </div>
+        <p-drawer header="Filter" [(visible)]="showFilterModal" position="right">
+            <div class="flex flex-col justify-between h-full">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <p class="text-sm">Category</p>
+                        <p-select [options]="categories" [(ngModel)]="selectedCategory" optionLabel="name"
+                            placeholder="Select a Category" />
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <p-button label="Reset" (click)="resetFilter()" />
+                </div>
+            </div>
+        </p-drawer>
+
+        <div class="grid w-full gap-6 grid-cols-1 lg:grid-cols-2 3xl:grid-cols-3 ">
+            <div *ngFor="let media of searchResults" class="relative overflow-hidden shadow-xl rounded-lg w-full">
+                <img *ngIf="media.background" [src]="media.background" alt="Background"
+                    class="absolute inset-0 w-full h-full object-cover opacity-10 z-0" />
+
+                <div class="relative z-10 flex flex-col sm:flex-row p-4 gap-4 items-start sm:h-56 max-w-full">
+                    <img *ngIf="media.cover" [src]="media.cover" alt="Cover" class="h-full w-auto rounded shadow-md" />
+
+                    <div class="flex flex-col justify-between h-full w-full">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center justify-between w-full">
+                                <div class="flex items-center">
+                                    <h3 class="text-xl font-semibold" title="{{ media.data.title }}">
+                                        {{ media.data.title }} <span *ngIf="media.data.year"
+                                            class="ml-2 text-sm text-gray-600 dark:text-gray-300 font-normal">({{ media.data.year
+                                            }})</span>
+                                    </h3>
+                                </div>
+                                <p-tag *ngIf="media.data.audienceRating" [value]="media.data.audienceRating"
+                                    [severity]="getRatingSeverity(media.data.audienceRating)"></p-tag>
+                            </div>
+                            <div class="flex gap-1">
+                                <p-chip *ngFor="let genre of media.genres" label="{{genre}}" />
+                            </div>
+                            <p class="text-sm text-gray-700 dark:text-gray-200 line-clamp-2">
+                                {{ media.data.summary || 'N/A' }}
+                            </p>
+
+                        </div>
+                        <div class="flex items-center justify-end gap-2">
+                            <p-button icon="pi pi-download" (click)="downloadMedia(media)" label="Download" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!isCheckingConnection && !isOnline" class="text-center text-red-500 py-10">
+        Server is offline. Please go back and select another one.
+    </div>
+
+</div>
+<p-dialog header="Download Media" [modal]="true" [(visible)]="showDownloadModal">
+    <div *ngIf="selectedDownload != undefined">
+        <ng-container *ngIf="!isLoadingDownload; else loadingTemplate">
+            <div class="flex w-full justify-center">
+                <p-selectbutton [options]="listOptions" [(ngModel)]="showList" optionLabel="name" optionValue="value"
+                    aria-labelledby="basic" />
+
+            </div>
+            <div *ngIf="showList" class="flex flex-col">
+                <textarea pTextarea [ngModel]="getAllDownloadUrls(downloadData)" [disabled]="true" [autoResize]="true"
+                    cols="50"></textarea>
+            </div>
+            <div *ngIf="!showList" class="flex flex-col gap-4">
+                <div *ngFor="let download of downloadData" class="flex flex-col gap-2">
+                    <h2 class="text-lg font-semibold">{{download.title}}</h2>
+                    <div *ngFor="let episode of download.episodes" class="flex items-center justify-between">
+                        <p>{{episode.title}}</p>
+                        <a href="{{episode.downloadUrl}}" target="_blank"><p-button size="small" label="Download" /></a>
+                    </div>
+                </div>
+
+                <!-- <div class="flex justify-end gap-2">
+                    <p-button label="Cancel" severity="secondary" (click)="showDownloadModal = false" />
+                </div> -->
+            </div>
+        </ng-container>
+
+        <ng-template #loadingTemplate>
+            <div class="flex flex-col justify-center items-center p-6">
+                <p-progress-spinner ariaLabel="loading" />
+                <span class="ml-4 text-sm text-gray-500">Loading details...</span>
+            </div>
+        </ng-template>
+    </div>
+</p-dialog>
+<p-toast />
