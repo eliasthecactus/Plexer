@@ -74,7 +74,7 @@ export class SetupComponent {
         this.servers = servers;
         console.log('Fetched servers:', this.servers);
         for (const server of this.servers) {
-          console.log('Checking server:', server);
+          // console.log('Checking server:', server);
           this.utilsService.isServerOnline(server).then((online) => {
             server.online = online;
             server.isChecked = true;

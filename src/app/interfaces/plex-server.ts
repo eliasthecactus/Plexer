@@ -6,4 +6,6 @@ export interface PlexServer {
     protocol: 'http' | 'https';
     local: boolean;
     isChecked: boolean;
+    uri: string;
+    accessToken: string;
 }

@@ -4,7 +4,6 @@ import { PlexAPI } from '@lukehagar/plexjs';
 import { PlexServer } from '../interfaces/plex-server';
 import { v4 as uuidv4 } from 'uuid';
 import { XMLParser } from 'fast-xml-parser';
-import { Plex } from '@lukehagar/plexjs/sdk/plex';
 import { SearchResult, SeasonType } from '../interfaces/search-result';
 
 @Injectable({
@@ -65,6 +64,7 @@ export class UtilsService {
     try {
       const api = new PlexAPI({ accessToken: token });
       const details = await api.authentication.getTokenDetails();
+      console.log('Token details:', details);
       return !!details.userPlexAccount?.id;
     } catch (error) {
       console.warn('Token validation failed:', error);
@@ -73,51 +73,100 @@ export class UtilsService {
     }
   }
 
-  getPlexServers(): Promise<PlexServer[]> {
-    return this.plexAPI.plex
-      .getServerResources(this.clientID)
-      .then((response: any) => {
-        const devices = response?.plexDevices ?? [];
+  async getPlexServers(): Promise<PlexServer[]> {
+    // return this.plexAPI.plex
+    //   .getServerResources(this.clientID)
+    //   .then((response: any) => {
+    //     const devices = response?.plexDevices ?? [];
 
-        if (!Array.isArray(devices) || devices.length === 0) {
-          return [];
-        }
+    //     if (!Array.isArray(devices) || devices.length === 0) {
+    //       return [];
+    //     }
 
-        const servers: PlexServer[] = [];
+    //     const servers: PlexServer[] = [];
 
-        devices.forEach((device: any) => {
-          const connections = device.connections ?? [];
+    //     devices.forEach((device: any) => {
+    //       const connections = device.connections ?? [];
 
-          connections.forEach((conn: any) => {
-            servers.push({
-              name: device.name ?? 'Unknown',
-              address: conn.address,
-              port: conn.port,
-              online: false,
-              protocol: conn.protocol as 'http' | 'https',
-              local: conn.local === true,
-              isChecked: false,
-            });
-          });
+    //       connections.forEach((conn: any) => {
+    //         servers.push({
+    //           name: device.name ?? 'Unknown',
+    //           address: conn.address,
+    //           port: conn.port,
+    //           online: false,
+    //           protocol: conn.protocol as 'http' | 'https',
+    //           local: conn.local === true,
+    //           isChecked: false,
+    //           uri: device.uri ?? '',
+    //         });
+    //       });
+    //     });
+
+    //     return servers;
+    //   })
+    //   .catch((err) => {
+    //     console.error('Error retrieving Plex servers:', err);
+    //     return [];
+    //   });
+
+    const url = `https://plex.tv/api/v2/resources?X-Plex-Client-Identifier=${
+      this.clientID
+    }&X-Plex-Token=${localStorage.getItem('plexToken')}&includeHttps=1`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch Plex resources');
+    }
+
+    const xml = await response.text();
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '',
+    });
+    const json = parser.parse(xml);
+    console.log('Parsed JSON:', json);
+    const devices = json.resources?.resource ?? [];
+    console.log('Devices:', devices);
+    const servers: PlexServer[] = [];
+
+    (Array.isArray(devices) ? devices : [devices]).forEach((device: any) => {
+      // console.log('Processing device:', device);
+      const connections = device.connections.connection ?? [];
+      const connectionList = Array.isArray(connections)
+        ? connections
+        : [connections];
+      console.log('Connections:', connectionList);
+      connectionList.forEach((conn: any) => {
+        servers.push({
+          name: device.name ?? 'Unknown',
+          address: conn.address,
+          port: conn.port,
+          online: false,
+          protocol: conn.protocol as 'http' | 'https',
+          local: conn.local === '1',
+          isChecked: false,
+          uri: conn.uri ?? '',
+          accessToken: device.accessToken || this.plexToken,
         });
-
-        return servers;
-      })
-      .catch((err) => {
-        console.error('Error retrieving Plex servers:', err);
-        return [];
       });
+    });
+
+    // console.log('Found servers:', servers);
+
+    return servers;
   }
 
   async isServerOnline(server: PlexServer): Promise<boolean> {
-    const baseURL = `${server.protocol}://${server.address}:${server.port}`;
+    const baseURL = `${server.uri}`;
+    console.log('Checking server online status:', baseURL);
     const tempAPI = new PlexAPI({
-      accessToken: this.plexToken || '',
+      accessToken: server.accessToken || '',
       serverURL: baseURL,
     });
 
     try {
-      const result = await tempAPI.server.getServerCapabilities();
+      const result = await tempAPI.server.getServerIdentity();
+      console.log('Server identity:', result);
       this.plexAPI = tempAPI;
       return !!result.object?.mediaContainer;
     } catch (err) {
@@ -164,13 +213,14 @@ export class UtilsService {
 
     //cannot use plex sdk here, types are wrong
     const server: PlexServer = JSON.parse(selectedServer);
-    const baseURL = `${server.protocol}://${server.address}:${server.port}`;
+    const baseURL = `${server.uri}`;
 
     const url = `${baseURL}/library/search?query=${encodeURIComponent(
       query
-    )}&X-Plex-Token=${this.plexToken}`;
+    )}&X-Plex-Token=${server.accessToken}`;
     try {
       const response = await fetch(url);
+      console.log('Results: ', response);
       const xml = await response.text();
       const parser = new XMLParser({
         ignoreAttributes: false,
@@ -231,13 +281,13 @@ export class UtilsService {
           item.Video.Media.Part &&
           item.Video.Media.Part.key
         ) {
-          item.downloadUrl = `${baseURL}${item.Video.Media.Part.key}?download=1&X-Plex-Token=${this.plexToken}`;
+          item.downloadUrl = `${baseURL}${item.Video.Media.Part.key}?download=1&X-Plex-Token=${server.accessToken}`;
         }
 
         if (Array.isArray(item.data.Image)) {
           for (const image of item.data.Image) {
             if (image?.url) {
-              image.url = `${baseURL}${image.url}?X-Plex-Token=${this.plexToken}`;
+              image.url = `${baseURL}${image.url}?X-Plex-Token=${server.accessToken}`;
               if (image.type == 'coverPoster') {
                 item.cover = image.url;
               } else if (image.type == 'background') {
@@ -266,8 +316,8 @@ export class UtilsService {
       return [];
     }
     const server: PlexServer = JSON.parse(selectedServer);
-    const baseURL = `${server.protocol}://${server.address}:${server.port}`;
-    const url = `${baseURL}${show.data.key}?X-Plex-Token=${this.plexToken}`;
+    const baseURL = `${server.uri}`;
+    const url = `${baseURL}${show.data.key}?X-Plex-Token=${server.accessToken}`;
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -302,7 +352,7 @@ export class UtilsService {
           type: season.type,
           episodes: [],
         } as SeasonType;
-        const url = `${baseURL}${season.key}?X-Plex-Token=${this.plexToken}`;
+        const url = `${baseURL}${season.key}?X-Plex-Token=${server.accessToken}`;
         const seasonResponse = await fetch(url);
         if (!seasonResponse.ok) {
           console.error(
@@ -320,12 +370,21 @@ export class UtilsService {
         });
         const seasonResult = parser.parse(seasonXml);
         console.log(seasonResult);
+        // check why sometimes there are multiple parts in media
         for (const episode of seasonResult.MediaContainer.Video || []) {
-          tempSeason.episodes.push({
-            title: episode.title,
-            key: episode.key,
-            downloadUrl: `${baseURL}${episode.Media.Part.key}?download=1&X-Plex-Token=${this.plexToken}`,
-          });
+          const parts = Array.isArray(episode.Media?.Part)
+            ? episode.Media.Part
+            : [episode.Media?.Part];
+
+          for (const part of parts) {
+            if (!part?.key) continue;
+
+            tempSeason.episodes.push({
+              title: episode.title,
+              key: episode.key,
+              downloadUrl: `${baseURL}${part.key}?download=1&X-Plex-Token=${server.accessToken}`,
+            });
+          }
         }
         if (tempSeason.episodes.length > 0) {
           seasons.push(tempSeason);
