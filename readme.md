@@ -17,7 +17,29 @@
 
 
 ## Usage
-Visit for [HTTP Plexer](http://plexer.apps.elias.uno) HTTP/HTTPS or [Plexer](https://eliasthecactus.github.io/plexer/browse) for only HTTPS. To run locally (support HTTP and HTTPS), use ```docker run --name plexer -p 8080:80 ghcr.io/eliasthecactus/plexer:latest``` and open [https://localhost:8080](https://localhost:8080)
+Plex has recently changed how some of its resources are served.
+Due to CORS restrictions, some features no longer work when running Plexer from GitHub Pages — like direct communication with Plex servers.
+
+This is expected behavior when using HTTPS GitHub-hosted frontend (e.g. https://eliasthecactus.github.io/plexer) to access private or local Plex servers.
+
+You can still use Plexer fully by running it locally via Docker, where CORS isn’t a problem.
+
+### Usage Options
+
+1. GitHub Pages (HTTPS only)
+- Visit: https://eliasthecactus.github.io/plexer/browse
+- Requires your Plex server to be publicly accessible via HTTPS and CORS-compliant (e.g., using a reverse proxy).
+
+2. Custom HTTP/HTTPS Deployment
+- Visit: http://plexer.apps.elias.uno
+- Your browser might block requests depending on the CORS policies of your Plex server.
+
+3. Local Docker Deployment (Recommended)
+```bash
+docker run --name plexer -p 8080:80 ghcr.io/eliasthecactus/plexer:latest
+```
+Then open:
+(http://localhost:8080)[http://localhost:8080] (for HTTP)
 
 
 ## 📃 ToDo

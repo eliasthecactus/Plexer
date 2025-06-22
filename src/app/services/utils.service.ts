@@ -5,6 +5,7 @@ import { PlexServer } from '../interfaces/plex-server';
 import { v4 as uuidv4 } from 'uuid';
 import { XMLParser } from 'fast-xml-parser';
 import { SearchResult, SeasonType } from '../interfaces/search-result';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -28,10 +29,10 @@ export class UtilsService {
   async plexLogin(username: string, password: string): Promise<boolean> {
     try {
       const result = await this.plexAPI.authentication.postUsersSignInData({
-        clientID: '3381b62b-9ab7-4e37-827b-203e9809eb58',
+        clientID: this.clientID,
         clientName: 'plexer',
-        deviceNickname: 'Roku 3',
-        clientVersion: '2.4.1',
+        deviceNickname: 'Plexer',
+        clientVersion: '1.1.1',
         platform: 'Web',
         requestBody: {
           login: username,
@@ -74,45 +75,9 @@ export class UtilsService {
   }
 
   async getPlexServers(): Promise<PlexServer[]> {
-    // return this.plexAPI.plex
-    //   .getServerResources(this.clientID)
-    //   .then((response: any) => {
-    //     const devices = response?.plexDevices ?? [];
-
-    //     if (!Array.isArray(devices) || devices.length === 0) {
-    //       return [];
-    //     }
-
-    //     const servers: PlexServer[] = [];
-
-    //     devices.forEach((device: any) => {
-    //       const connections = device.connections ?? [];
-
-    //       connections.forEach((conn: any) => {
-    //         servers.push({
-    //           name: device.name ?? 'Unknown',
-    //           address: conn.address,
-    //           port: conn.port,
-    //           online: false,
-    //           protocol: conn.protocol as 'http' | 'https',
-    //           local: conn.local === true,
-    //           isChecked: false,
-    //           uri: device.uri ?? '',
-    //         });
-    //       });
-    //     });
-
-    //     return servers;
-    //   })
-    //   .catch((err) => {
-    //     console.error('Error retrieving Plex servers:', err);
-    //     return [];
-    //   });
-
     const url = `https://plex.tv/api/v2/resources?X-Plex-Client-Identifier=${
       this.clientID
     }&X-Plex-Token=${localStorage.getItem('plexToken')}&includeHttps=1`;
-
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error('Failed to fetch Plex resources');
@@ -151,26 +116,46 @@ export class UtilsService {
       });
     });
 
-    // console.log('Found servers:', servers);
-
     return servers;
   }
 
   async isServerOnline(server: PlexServer): Promise<boolean> {
-    const baseURL = `${server.uri}`;
+    const directBaseURL = `${server.uri}/identity?X-Plex-Token=${server.accessToken}`;
+    const baseURL = `${server.protocol}://${server.address}:${server.port}/identity?X-Plex-Token=${server.accessToken}`;
     console.log('Checking server online status:', baseURL);
-    const tempAPI = new PlexAPI({
-      accessToken: server.accessToken || '',
-      serverURL: baseURL,
-    });
-
     try {
-      const result = await tempAPI.server.getServerIdentity();
+      const response = await fetch(baseURL);
+      if (!response.ok) {
+        console.warn(`Server ${baseURL} is offline:`, response.statusText);
+        return false;
+      }
+      const xml = await response.text();
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '',
+      });
+      const result = parser.parse(xml);
       console.log('Server identity:', result);
-      this.plexAPI = tempAPI;
-      return !!result.object?.mediaContainer;
+      return !!result?.MediaContainer;
     } catch (err) {
-      console.warn(`Failed to get capabilities for ${baseURL}:`, err);
+      console.warn(`Failed to fetch server identity for ${baseURL}:`, err);
+    }
+    try {
+      const response = await fetch(directBaseURL);
+      if (!response.ok) {
+        console.warn(`Server ${directBaseURL} is offline:`, response.statusText);
+        return false;
+      }
+      const xml = await response.text();
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '',
+      });
+      const result = parser.parse(xml);
+      console.log('Server identity:', result);
+      return !!result?.MediaContainer;
+    } catch (err) {
+      console.warn(`Failed to fetch server identity for ${directBaseURL}:`, err);
       return false;
     }
   }

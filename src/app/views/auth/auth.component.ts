@@ -74,11 +74,7 @@ export class AuthComponent {
             summary: 'Login Successful',
             detail: 'You are now logged in.',
           });
-          this.router
-            .navigateByUrl('/', { skipLocationChange: true })
-            .then(() => {
-              this.router.navigate(['/setup']);
-            });
+          this.router.navigate(['/setup']);
         } else {
           this.messageService.add({
             severity: 'error',
